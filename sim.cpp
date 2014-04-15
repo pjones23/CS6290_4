@@ -358,6 +358,7 @@ void print_stats() {
   out << "Overall" << endl;
   numInstr = retired_instruction;
   out << "Total number of instructions: " << numInstr << endl;
+  numSimCyles = cycle_count;
   out << "Total simulation cycles: " << numSimCyles << endl;
   out << "Number of floating point operations: " << numfpInstr << endl;
   out << "Number of integer operations: " << numIntInstr << endl;
@@ -375,7 +376,9 @@ void print_stats() {
   Number of register reads for fp operations (McPAT: float_regfile_reads, fpu_access) (You can use the number of src operands.)
 */
   out << "Fetch stage" << endl;
+  numICacheAccesses = numInstr;
   out << "Number of I-cache accesses: " << numICacheAccesses << endl;
+  numBranchMisPred = bpred_mispred_count;
   out << "Number of branch mispredictions: " << numBranchMisPred << endl;
   out << "Number of scheduler accesses: " << numSchedAccesses << endl;
   out << "Number of register reads for integer operations: " << numIntRegReads << endl;
@@ -397,6 +400,7 @@ void print_stats() {
   out << "Memory stage" << endl;
   out << "Number of data cache reads: " << numDCacheReads << endl;
   out << "Number of data cache writes: " << numDCacheWrites << endl;
+  numMemAccesses = dram_row_buffer_hit_count + dram_row_buffer_miss_count;
   out << "Number of memory accesses: " << numMemAccesses << endl;
 
 /*
@@ -963,6 +967,11 @@ void EX_stage()
 				ID_latch->stage_stall=false;	//if stage stalled remove stall
 				EX_latch->op=ID_latch->op;		//transfer pointer to next stage
 				EX_latch->op_valid=true;		// set op as valid for the stage
+
+				// increment multiply counter
+				if((EX_latch->op)->opcode == OP_IMUL || (EX_latch->op)->opcode == OP_MM){
+					numMultInstr++;
+				}
 
 			}
 			else
