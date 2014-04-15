@@ -28,6 +28,34 @@ bool pte_load_done = false;
 Op* dummy_op = new Op;
 /****** LAB 3 ********/
 
+/*******************************************************************/
+/*  LAB 4 Counters  */
+/*******************************************************************/
+//Overall
+uint64_t numInstr;
+uint64_t numSimCyles;
+uint64_t numfpInstr;
+uint64_t numIntInstr;
+uint64_t numBranchInstr;
+uint64_t numLDInstr;
+uint64_t numSTInstr;
+//Fetch
+uint64_t numICacheAccesses;
+uint64_t numBranchMisPred;
+uint64_t numSchedAccesses;
+uint64_t numIntRegReads;
+uint64_t numfpRegReads;
+//Execution
+uint64_t numMultInstr;
+//Memory
+uint64_t numDCacheReads;
+uint64_t numDCacheWrites;
+uint64_t numMemAccesses;
+//WB
+uint64_t numIntRegWrites;
+uint64_t numfpRegWrites;
+
+
 
 bool run_a_cycle(memory_c *m ); // please modify run_a_cycle function argument  /** NEW-LAB2 */ 
 void init_structures(memory_c *m); // please modify init_structures function argument  /** NEW-LAB2 */ 
@@ -312,7 +340,72 @@ void print_stats() {
   out << "Total Branch Predictor Mispredictions: " << bpred_mispred_count << endl;   
   out << "Total Branch Predictor OK predictions: " << bpred_okpred_count << endl;   
   out << "Total DTLB Hit: " << dtlb_hit_count << endl; 
-  out << "Total DTLB Miss: " << dtlb_miss_count << endl; 
+  out << "Total DTLB Miss: " << dtlb_miss_count << endl;
+
+  // print out McPAT counters
+  out << "---------------McPAT Counters--------------" << endl;
+/*
+  Overall
+  Total number of instructions (McPAT: total_instructions, committed_instructions)
+  Total simulation cycles (McPAT: total_cycles, busy_cycles)
+  Number of floating point operations (McPAT: fp_instructions, committed_fp_instructions)
+  Number of integer operations (McPAT: int_instructions, committed_int_instructions)
+  Number of branch instructions (McPAT: branch_instructions)
+  Number of load instructions (McPAT: load_instructions)
+  Number of store instructions (McPAT: store_instructions)
+*/
+
+  out << "Overall" << endl;
+  out << "Total DTLB Miss: " << numInstr << endl;
+  out << "Total DTLB Miss: " << numSimCyles << endl;
+  out << "Total DTLB Miss: " << numfpInstr << endl;
+  out << "Total DTLB Miss: " << numIntInstr << endl;
+  out << "Total DTLB Miss: " << numBranchInstr << endl;
+  out << "Total DTLB Miss: " << numLDInstr << endl;
+  out << "Total DTLB Miss: " << numSTInstr << endl;
+
+
+/*
+  Fetch Stage
+  Number of I-cache accesses (McPAT:icache read_accesses)
+  Number of branch mispredictions (McPAT: branch_mispredictions)
+  Number of scheduler accesses (i.e. the number of times a scheduler is accessed. Since we do not have a scheduler in our simulator, if there is an instruction in the decode stage, you just increment this counter value. Based on instruction type, you have to increment floating point and integer instructions. McPAT: ROB_reads, ROB_writes, rename_accesses, fp_rename_accesses, inst_window_reads, inst_window_writes, inst_window_wakeup_accesses, fp_inst_window_reads, fp_inst_window_writes, fp_inst_window_wakeup_accesses)
+  Number of register reads for integer operations (McPAT: int_regfile_reads, ialu_access)
+  Number of register reads for fp operations (McPAT: float_regfile_reads, fpu_access) (You can use the number of src operands.)
+*/
+  out << "Fetch stage" << endl;
+  out << "Total DTLB Miss: " << numICacheAccesses << endl;
+  out << "Total DTLB Miss: " << numBranchMisPred << endl;
+  out << "Total DTLB Miss: " << numSchedAccesses << endl;
+  out << "Total DTLB Miss: " << numIntRegReads << endl;
+  out << "Total DTLB Miss: " << numfpRegReads << endl;
+
+/*
+  Execution Stage
+  Number of multiply instructions (OP_IMUL, OP_MM in simulator) (McPAT: mul_accesses)
+*/
+  out << "Execution stage" << endl;
+  out << "Total DTLB Miss: " << numMultInstr << endl;
+
+/*
+  Memory
+  Number of data cache reads (McPAT: dtlb:total_accesses (read+write), dcache:read_accesses)
+  Number of data cache writes (McPAT: dtlb:total_accesses (read+write), dcache:write_accesses)
+  Number of memory accesses (McPAT: system.Noc0:total_accesses = 4 times of number of memory accesses, system.mem.Memory accesses, system.mem.memory_reads, system.mem.memory_writes, (system.mc.memory_accesses, = 4 times of number of memory accesses system.mc.memory_reads = system.mc.memory_writes = 2 times of number of memory accesses))
+*/
+  out << "Memory stage" << endl;
+  out << "Total DTLB Miss: " << numDCacheReads << endl;
+  out << "Total DTLB Miss: " << numDCacheWrites << endl;
+  out << "Total DTLB Miss: " << numMemAccesses << endl;
+
+/*
+  WB
+  Number of register writes for integer operations (int_regfile_writes)
+  Number of register writes for fp operations (float_regfile_writes)
+*/
+  out << "WB stage" << endl;
+  out << "Total DTLB Miss: " << numIntRegWrites << endl;
+  out << "Total DTLB Miss: " << numfpRegWrites << endl;
 
   out.close();
 }
@@ -509,6 +602,32 @@ void init_structures(memory_c *main_memory) // please modify init_structures fun
 	init_register_file();	//fn added by apkarande
 	main_memory->init_mem();	//initialize main memory
 	cache_init(data_cache,KNOB(KNOB_DCACHE_SIZE)->getValue(),KNOB(KNOB_BLOCK_SIZE)->getValue(),KNOB(KNOB_DCACHE_WAY)->getValue(),"L1 dcache");	//initialize data cache
+
+	//Initialize lab4 counters
+	//Overall
+	numInstr = 0;
+	numSimCyles = 0;
+	numfpInstr = 0;
+	numIntInstr = 0;
+	numBranchInstr = 0;
+	numLDInstr = 0;
+	numSTInstr = 0;
+	//Fetch
+	numICacheAccesses = 0;
+	numBranchMisPred = 0;
+	numSchedAccesses = 0;
+	numIntRegReads = 0;
+	numfpRegReads = 0;
+	//Execution
+	numMultInstr = 0;
+	//Memory
+	numDCacheReads = 0;
+	numDCacheWrites = 0;
+	numMemAccesses = 0;
+	//WB
+	numIntRegWrites = 0;
+	numfpRegWrites = 0;
+
 }
 
 #define MEM_MISPRED_BRANCH		(retire_op->mispredicted_branch == true)
