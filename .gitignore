@@ -1,0 +1,10 @@
+*.cproject
+*.project
+*.settings/
+*.settings/*
+*.o
+*.txt
+*.out
+*.pzip
+*.sh
+sim
