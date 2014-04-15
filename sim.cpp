@@ -42,6 +42,7 @@ uint64_t numSTInstr;
 //Fetch
 uint64_t numICacheAccesses;
 uint64_t numBranchMisPred;
+//ID
 uint64_t numSchedAccesses;
 uint64_t numIntRegReads;
 uint64_t numfpRegReads;
@@ -371,15 +372,19 @@ void print_stats() {
   Fetch Stage
   Number of I-cache accesses (McPAT:icache read_accesses)
   Number of branch mispredictions (McPAT: branch_mispredictions)
-  Number of scheduler accesses (i.e. the number of times a scheduler is accessed. Since we do not have a scheduler in our simulator, if there is an instruction in the decode stage, you just increment this counter value. Based on instruction type, you have to increment floating point and integer instructions. McPAT: ROB_reads, ROB_writes, rename_accesses, fp_rename_accesses, inst_window_reads, inst_window_writes, inst_window_wakeup_accesses, fp_inst_window_reads, fp_inst_window_writes, fp_inst_window_wakeup_accesses)
-  Number of register reads for integer operations (McPAT: int_regfile_reads, ialu_access)
-  Number of register reads for fp operations (McPAT: float_regfile_reads, fpu_access) (You can use the number of src operands.)
 */
   out << "Fetch stage" << endl;
   numICacheAccesses = numInstr;
   out << "Number of I-cache accesses: " << numICacheAccesses << endl;
   numBranchMisPred = bpred_mispred_count;
   out << "Number of branch mispredictions: " << numBranchMisPred << endl;
+
+/*
+    Instruction Decode Stage
+    Number of scheduler accesses (i.e. the number of times a scheduler is accessed. Since we do not have a scheduler in our simulator, if there is an instruction in the decode stage, you just increment this counter value. Based on instruction type, you have to increment floating point and integer instructions. McPAT: ROB_reads, ROB_writes, rename_accesses, fp_rename_accesses, inst_window_reads, inst_window_writes, inst_window_wakeup_accesses, fp_inst_window_reads, fp_inst_window_writes, fp_inst_window_wakeup_accesses)
+    Number of register reads for integer operations (McPAT: int_regfile_reads, ialu_access)
+    Number of register reads for fp operations (McPAT: float_regfile_reads, fpu_access) (You can use the number of src operands.)
+*/
   out << "Number of scheduler accesses: " << numSchedAccesses << endl;
   out << "Number of register reads for integer operations: " << numIntRegReads << endl;
   out << "Number of register reads for fp operations: " << numfpRegReads << endl;
@@ -620,6 +625,7 @@ void init_structures(memory_c *main_memory) // please modify init_structures fun
 	//Fetch
 	numICacheAccesses = 0;
 	numBranchMisPred = 0;
+	//ID
 	numSchedAccesses = 0;
 	numIntRegReads = 0;
 	numfpRegReads = 0;
@@ -1076,6 +1082,29 @@ void FE_stage()
 
 			FE_latch->op=new_op;
 			FE_latch->op_valid=true;
+
+			// increment instruction type counters
+			if ((FE_latch->op)->is_fp){
+				// increment # of fp operations
+				numfpInstr++;
+			}
+			else{
+				// increment # of integer operations
+				numIntInstr++;
+			}
+			if ((FE_latch->op)->cf_type > NOT_CF){
+				// increment # of branch instructions
+				numBranchInstr++;
+			}
+			if ((FE_latch->op)->mem_type == MEM_LD){
+				// increment # of load instructions
+				numLDInstr++;
+			}
+			if ((FE_latch->op)->mem_type == MEM_LD){
+				// increment # of store instructions
+				numSTInstr++;
+			}
+
 		}
 		else
 			free_op(new_op);
