@@ -651,7 +651,17 @@ void WB_stage()
 			FE_latch->stage_stall = false;
 		}
 		if((retire_op->dst!=-1) && (reg_writing_ops[retire_op->dst] == retire_op->inst_id))
+		{
 			register_file[retire_op->dst].valid=true;
+			// increment reg write counter
+			if(retire_op->is_fp){
+				numfpRegWrites++;
+			}
+			else{
+				numIntRegWrites++;
+			}
+
+		}
 		retired_instruction++;
 		MEM_latch->op_queue.pop_front();
 		free_op(retire_op);
