@@ -406,6 +406,7 @@ void print_stats() {
 */
   out << "Memory stage" << endl;
   out << "Number of data cache reads: " << numDCacheReads << endl;
+  numDCacheWrites = dcache_miss_count;
   out << "Number of data cache writes: " << numDCacheWrites << endl;
   numMemAccesses = dram_row_buffer_hit_count + dram_row_buffer_miss_count;
   out << "Number of memory accesses: " << numMemAccesses << endl;
@@ -742,6 +743,7 @@ void MEM_stage(memory_c *main_memory)  // please modify MEM_stage function argum
 							latency_count--;
 							if(latency_count == 0)
 							{
+								numDCacheReads++;
 								if(dcache_access(pteaddr))
 								{
 									dcache_hit_count++;
@@ -816,6 +818,7 @@ void MEM_stage(memory_c *main_memory)  // please modify MEM_stage function argum
 						latency_count--;
 						if(latency_count == 0)
 						{
+							numDCacheReads++;
 							if(dcache_access((EX_latch->op)->ld_vaddr))
 							{
 								address_translation_done = false;		//reset the address_translation_done flag
@@ -891,6 +894,7 @@ void MEM_stage(memory_c *main_memory)  // please modify MEM_stage function argum
 						latency_count--;
 						if(latency_count == 0)
 						{
+							numDCacheReads++;
 							if(dcache_access((EX_latch->op)->st_vaddr))
 							{
 								address_translation_done = false;		//reset the address_translation_done flag
