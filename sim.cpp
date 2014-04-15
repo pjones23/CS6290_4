@@ -356,13 +356,14 @@ void print_stats() {
 */
 
   out << "Overall" << endl;
-  out << "Total DTLB Miss: " << numInstr << endl;
-  out << "Total DTLB Miss: " << numSimCyles << endl;
-  out << "Total DTLB Miss: " << numfpInstr << endl;
-  out << "Total DTLB Miss: " << numIntInstr << endl;
-  out << "Total DTLB Miss: " << numBranchInstr << endl;
-  out << "Total DTLB Miss: " << numLDInstr << endl;
-  out << "Total DTLB Miss: " << numSTInstr << endl;
+  numInstr = retired_instruction;
+  out << "Total number of instructions: " << numInstr << endl;
+  out << "Total simulation cycles: " << numSimCyles << endl;
+  out << "Number of floating point operations: " << numfpInstr << endl;
+  out << "Number of integer operations: " << numIntInstr << endl;
+  out << "Number of branch instructions: " << numBranchInstr << endl;
+  out << "Number of load instructions: " << numLDInstr << endl;
+  out << "Number of store instructions: " << numSTInstr << endl;
 
 
 /*
@@ -374,18 +375,18 @@ void print_stats() {
   Number of register reads for fp operations (McPAT: float_regfile_reads, fpu_access) (You can use the number of src operands.)
 */
   out << "Fetch stage" << endl;
-  out << "Total DTLB Miss: " << numICacheAccesses << endl;
-  out << "Total DTLB Miss: " << numBranchMisPred << endl;
-  out << "Total DTLB Miss: " << numSchedAccesses << endl;
-  out << "Total DTLB Miss: " << numIntRegReads << endl;
-  out << "Total DTLB Miss: " << numfpRegReads << endl;
+  out << "Number of I-cache accesses: " << numICacheAccesses << endl;
+  out << "Number of branch mispredictions: " << numBranchMisPred << endl;
+  out << "Number of scheduler accesses: " << numSchedAccesses << endl;
+  out << "Number of register reads for integer operations: " << numIntRegReads << endl;
+  out << "Number of register reads for fp operations: " << numfpRegReads << endl;
 
 /*
   Execution Stage
   Number of multiply instructions (OP_IMUL, OP_MM in simulator) (McPAT: mul_accesses)
 */
   out << "Execution stage" << endl;
-  out << "Total DTLB Miss: " << numMultInstr << endl;
+  out << "Number of multiply instructions: " << numMultInstr << endl;
 
 /*
   Memory
@@ -394,9 +395,9 @@ void print_stats() {
   Number of memory accesses (McPAT: system.Noc0:total_accesses = 4 times of number of memory accesses, system.mem.Memory accesses, system.mem.memory_reads, system.mem.memory_writes, (system.mc.memory_accesses, = 4 times of number of memory accesses system.mc.memory_reads = system.mc.memory_writes = 2 times of number of memory accesses))
 */
   out << "Memory stage" << endl;
-  out << "Total DTLB Miss: " << numDCacheReads << endl;
-  out << "Total DTLB Miss: " << numDCacheWrites << endl;
-  out << "Total DTLB Miss: " << numMemAccesses << endl;
+  out << "Number of data cache reads: " << numDCacheReads << endl;
+  out << "Number of data cache writes: " << numDCacheWrites << endl;
+  out << "Number of memory accesses: " << numMemAccesses << endl;
 
 /*
   WB
@@ -404,8 +405,8 @@ void print_stats() {
   Number of register writes for fp operations (float_regfile_writes)
 */
   out << "WB stage" << endl;
-  out << "Total DTLB Miss: " << numIntRegWrites << endl;
-  out << "Total DTLB Miss: " << numfpRegWrites << endl;
+  out << "Number of register writes for integer operations: " << numIntRegWrites << endl;
+  out << "Number of register writes for fp operations: " << numfpRegWrites << endl;
 
   out.close();
 }
