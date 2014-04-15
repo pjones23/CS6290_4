@@ -43,7 +43,8 @@ uint64_t numSTInstr;
 uint64_t numICacheAccesses;
 uint64_t numBranchMisPred;
 //ID
-uint64_t numSchedAccesses;
+uint64_t numIntSchedAccesses;
+uint64_t numfpSchedAccesses;
 uint64_t numIntRegReads;
 uint64_t numfpRegReads;
 //Execution
@@ -385,7 +386,8 @@ void print_stats() {
     Number of register reads for integer operations (McPAT: int_regfile_reads, ialu_access)
     Number of register reads for fp operations (McPAT: float_regfile_reads, fpu_access) (You can use the number of src operands.)
 */
-  out << "Number of scheduler accesses: " << numSchedAccesses << endl;
+  out << "Number of scheduler accesses (integer): " << numIntSchedAccesses << endl;
+  out << "Number of scheduler accesses (floating point): " << numfpSchedAccesses << endl;
   out << "Number of register reads for integer operations: " << numIntRegReads << endl;
   out << "Number of register reads for fp operations: " << numfpRegReads << endl;
 
@@ -626,7 +628,8 @@ void init_structures(memory_c *main_memory) // please modify init_structures fun
 	numICacheAccesses = 0;
 	numBranchMisPred = 0;
 	//ID
-	numSchedAccesses = 0;
+	numIntSchedAccesses = 0;
+	numfpSchedAccesses = 0;
 	numIntRegReads = 0;
 	numfpRegReads = 0;
 	//Execution
@@ -1043,6 +1046,16 @@ void ID_stage()
 						control_hazard_count++;
 						FE_latch->stage_stall = true;
 					}
+				}
+
+				// increment reg read counter and scheduler access counter
+				if((ID_latch->op)->is_fp){
+					numfpRegReads++;
+					numfpSchedAccesses++;
+				}
+				else{
+					numIntRegReads++;
+					numIntSchedAccesses++;
 				}
 			}
 			else
