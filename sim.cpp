@@ -373,8 +373,7 @@ void print_stats() {
 	 Number of register reads for fp operations (McPAT: float_regfile_reads, fpu_access) (You can use the number of src operands.)
 	 */
 	out << "Instruction Decode stage" << endl;
-	out << "Number of scheduler accesses: " << numSchedAccesses
-				<< endl;
+	out << "Number of scheduler accesses: " << numSchedAccesses << endl;
 	out << "Number of integer scheduler accesses: " << numIntSchedAccesses
 			<< endl;
 	out << "Number of floating point scheduler accesses: " << numfpSchedAccesses
@@ -660,7 +659,7 @@ void WB_stage() {
 			// increment reg write counter
 			if (is_fp(retire_op)) {
 				numfpRegWrites++;
-			} else if (is_int(retire_op)){
+			} else if (is_int(retire_op)) {
 				numIntRegWrites++;
 			}
 
@@ -956,14 +955,12 @@ void ID_stage() {
 
 	if (FE_latch->op_valid == true)		//check if inst lies in the FE latch
 			{
-		// increment reg read counter and scheduler access counter
+		// increment scheduler access counter
 		numSchedAccesses++;
 		if (is_fp(FE_latch->op)) {
 			numfpSchedAccesses++;
-			numfpRegReads++;
 		} else if (is_int(FE_latch->op)) {
 			numIntSchedAccesses++;
-			numIntRegReads++;
 		}
 		if ((NUM_SRC_1 && (SRC_INVALID(0)))
 				|| (NUM_SRC_2 && (SRC_INVALID(0) || SRC_INVALID(1))))//check for source-dest clash
@@ -987,6 +984,12 @@ void ID_stage() {
 					register_file[(FE_latch->op)->dst].valid = false;
 					reg_writing_ops[(FE_latch->op)->dst] =
 							FE_latch->op->inst_id; // in WB stage, clear valid flag of register only if this is the op
+					// increment reg read counter
+					if (is_fp(FE_latch->op)) {
+						numfpRegReads++;
+					} else if (is_int(FE_latch->op)) {
+						numIntRegReads++;
+					}
 				}
 				//checking branch in the end is important
 				if ((FE_latch->op)->cf_type >= CF_BR) {
@@ -1037,7 +1040,7 @@ void FE_stage() {
 			if (is_fp(FE_latch->op)) {
 				// increment # of fp operations
 				numfpInstr++;
-			} else if (is_int(FE_latch->op)){
+			} else if (is_int(FE_latch->op)) {
 				// increment # of integer operations
 				numIntInstr++;
 			}
